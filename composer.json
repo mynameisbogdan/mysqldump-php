@@ -1,0 +1,13 @@
+{
+  "name": "mnib/php-mysqldump",
+  "type": "library",
+  "require": {
+    "php": "^5.5|^7.0",
+    "symfony/process": "^3.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "MNIB\\": "src/"
+    }
+  }
+}
