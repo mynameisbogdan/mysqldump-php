@@ -1,5 +1,5 @@
 {
-  "name": "mnib/php-mysqldump",
+  "name": "mnib/mysqldump-php",
   "type": "library",
   "require": {
     "php": "^5.5|^7.0",
