@@ -1,4 +1,6 @@
 # Usage
+    ```php
+    <?php
     chdir(__DIR__);
     $dump = new \MNIB\MysqlDump($dbname, $host, $port, $user, $password);
     ...
