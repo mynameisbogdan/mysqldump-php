@@ -23,6 +23,15 @@ class MysqlDump
     /** @var null|string */
     private $password;
 
+    /**
+     * Constructor.
+     *
+     * @param string $dbname
+     * @param null $host
+     * @param null $port
+     * @param null $user
+     * @param null $password
+     */
     public function __construct($dbname, $host = null, $port = null, $user = null, $password = null)
     {
         $this->dbname = $dbname;
@@ -33,28 +42,38 @@ class MysqlDump
     }
 
     /**
-     * @param string $file
-     * @param array $selectedTables
-     * @param array $ignoreTables
+     * @param array $options
+     * @return bool
      */
-    public function createBackup($file, array $selectedTables = [], array $ignoreTables = [])
+    public function run(array $options = [])
     {
-        if (!isset($file) || !$file) {
-            throw new \RuntimeException('Required parameter "$file" is not set.');
+        if (!isset($options['file']) || !$options['file']) {
+            throw new \RuntimeException('Required parameter "$options[\'file\']" is not set.');
         }
 
-        if (!is_dir(dirname($file))) {
+        if (!is_dir(dirname($options['file']))) {
             throw new \RuntimeException(sprintf(
                 'Directory %s does not exist for file value of %s',
-                dirname($file),
-                $file
+                dirname($options['file']),
+                $options['file']
             ));
         }
 
-        $command = sprintf(
-            'mysqldump --max_allowed_packet=1G --single-transaction --routines --triggers %s',
-            escapeshellarg($this->dbname)
-        );
+        $command = 'mysqldump';
+
+        if (isset($options['defaults_extra_file']) && $options['defaults_extra_file']) {
+            if (!file_exists($options['defaults_extra_file'])) {
+                throw new \RuntimeException(
+                    sprintf('Defaults extra file missing: %s', $options['defaults_extra_file'])
+                );
+            }
+
+            $command .= sprintf(' --defaults-extra-file=%s', escapeshellarg($options['defaults_extra_file']));
+        }
+
+        if (isset($options['max_allowed_packet']) && $options['max_allowed_packet']) {
+            $command .= sprintf(' --max_allowed_packet=%s', escapeshellarg($options['max_allowed_packet']));
+        }
 
         if (null !== $this->host && $this->host) {
             $command .= sprintf(' --host=%s', escapeshellarg($this->host));
@@ -72,52 +91,37 @@ class MysqlDump
             $command .= sprintf(' --password=%s', escapeshellarg($this->password));
         }
 
-        foreach ($selectedTables as $table) {
-            $command .= ' ' . escapeshellarg($table);
+        $command .= sprintf(' --no-data --single-transaction --routines --triggers %s', escapeshellarg($this->dbname));
+
+        if (isset($options['selected_tables']) && is_array($options['selected_tables'])) {
+            foreach ($options['selected_tables'] as $table) {
+                $command .= ' ' . escapeshellarg($table);
+            }
         }
 
-        foreach ($ignoreTables as $table) {
-            $command .= sprintf(' --ignore-table=%s.%s', escapeshellarg($this->dbname), escapeshellarg($table));
+        if (isset($options['ignored_tables']) && is_array($options['selected_tables'])) {
+            foreach ($options['ignored_tables'] as $table) {
+                $command .= sprintf(' --ignore-table=%s.%s', escapeshellarg($this->dbname), escapeshellarg($table));
+            }
         }
 
         // Remove DEFINER clause
         $command .= ' | sed \'s/DEFINER=[^*]*\*/\*/g\'';
 
         // Save to file
-        $command .= sprintf(' > %s', escapeshellarg($file));
+        $command .= sprintf(' > %s', escapeshellarg($options['file']));
 
-        $this->execute($command);
-    }
-
-    /**
-     * @param string $file
-     * @return string
-     */
-    public function archiveBackup($file)
-    {
-        if (!isset($file) || !$file) {
-            throw new \RuntimeException('Required parameter "$file" is not set.');
+        if (isset($options['archive']) && $options['archive']) {
+            $command .= sprintf(
+                ' && pbzip2 --compress --best -c %s > %s',
+                escapeshellarg($options['file']),
+                escapeshellarg($options['archive'])
+            );
         }
-
-        if (!is_dir(dirname($file))) {
-            throw new \RuntimeException(sprintf(
-                'Directory %s does not exist for file value of %s',
-                dirname($file),
-                $file
-            ));
-        }
-
-        $archive = sprintf('%s.bz2', $file);
-
-        $command = sprintf(
-            'pbzip2 --best -f %s > %s',
-            escapeshellarg($file),
-            escapeshellarg($archive)
-        );
 
         $this->execute($command);
 
-        return $archive;
+        return true;
     }
 
     /**
