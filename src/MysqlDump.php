@@ -43,8 +43,12 @@ class MysqlDump
             throw new \RuntimeException('Required parameter "$file" is not set.');
         }
 
-        if (!is_writable($directory = realpath(dirname($file)))) {
-            throw new \RuntimeException(sprintf('Directory "%s" is not writable.', $directory));
+        if (!is_dir(dirname($file))) {
+            throw new \RuntimeException(sprintf(
+                'Directory %s does not exist for file value of %s',
+                dirname($file),
+                $file
+            ));
         }
 
         $command = sprintf(
@@ -95,8 +99,12 @@ class MysqlDump
             throw new \RuntimeException('Required parameter "$file" is not set.');
         }
 
-        if (!is_writable($directory = realpath(dirname($file)))) {
-            throw new \RuntimeException(sprintf('Directory "%s" is not writable.', $directory));
+        if (!is_dir(dirname($file))) {
+            throw new \RuntimeException(sprintf(
+                'Directory %s does not exist for file value of %s',
+                dirname($file),
+                $file
+            ));
         }
 
         $archive = sprintf('%s.bz2', $file);
