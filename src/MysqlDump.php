@@ -91,7 +91,7 @@ class MysqlDump
             $command .= sprintf(' --password=%s', escapeshellarg($this->password));
         }
 
-        $command .= sprintf(' --no-data --single-transaction --routines --triggers %s', escapeshellarg($this->dbname));
+        $command .= sprintf(' --single-transaction --routines --triggers %s', escapeshellarg($this->dbname));
 
         if (isset($options['selected_tables']) && is_array($options['selected_tables'])) {
             foreach ($options['selected_tables'] as $table) {
