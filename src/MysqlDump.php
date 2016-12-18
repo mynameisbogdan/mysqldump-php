@@ -99,7 +99,7 @@ class MysqlDump
             }
         }
 
-        if (isset($options['ignored_tables']) && is_array($options['selected_tables'])) {
+        if (isset($options['ignored_tables']) && is_array($options['ignored_tables'])) {
             foreach ($options['ignored_tables'] as $table) {
                 $command .= sprintf(' --ignore-table=%s.%s', escapeshellarg($this->dbname), escapeshellarg($table));
             }
