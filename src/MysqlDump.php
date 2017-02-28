@@ -98,7 +98,7 @@ class MysqlDump
                 case 'schema':
                     $command .= ' --no-data';
                     break;
-                case 'dataa':
+                case 'data':
                     $command .= ' --no-create-info --no-create-db --skip-triggers --skip-routines';
                     break;
                 default:
