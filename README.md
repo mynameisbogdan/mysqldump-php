@@ -9,6 +9,7 @@ $dump->run([
     'archive' => __DIR__ . '/dump.sql.bz2',
     'defaults_extra_file' => __DIR__ . '/custom-my-file.cnf',
     'max_allowed_packet' => '512M',
+    'dump_type' => '', // Valid options: null, "schema" or "data"
     'selected_tables' => [
         'product',
     ],

@@ -45,7 +45,7 @@ class MysqlDump
      * @param array $options
      * @return bool
      */
-    public function run(array $options = [])
+    public function run(array $options)
     {
         if (!isset($options['file']) || !$options['file']) {
             throw new \RuntimeException('Required parameter "$options[\'file\']" is not set.');
@@ -92,6 +92,23 @@ class MysqlDump
         }
 
         $command .= sprintf(' --single-transaction --routines --triggers %s', escapeshellarg($this->dbname));
+
+        if (isset($options['dump_type']) && $options['dump_type']) {
+            switch ($options['dump_type']) {
+                case 'schema':
+                    $command .= ' --no-data';
+                    break;
+                case 'dataa':
+                    $command .= ' --no-create-info --no-create-db --skip-triggers --skip-routines';
+                    break;
+                default:
+                    throw new \UnexpectedValueException(sprintf(
+                        'Dump type "%s" not valid. Valid options: null, "schema" or "data".',
+                        $options['dump_type']
+                    ));
+                    break;
+            }
+        }
 
         if (isset($options['selected_tables']) && is_array($options['selected_tables'])) {
             foreach ($options['selected_tables'] as $table) {
