@@ -123,7 +123,7 @@ class MysqlDump
         }
 
         // Remove DEFINER clause
-        $command .= ' | sed \'s/DEFINER=[^ |\*]* //g\'';
+        $command .= ' | sed \'s/DEFINER=[^ |\*]*//g\'';
 
         // Save to file
         $command .= sprintf(' > %s', escapeshellarg($options['file']));
