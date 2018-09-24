@@ -1,14 +1,20 @@
 {
-  "name": "mnib/mysqldump-php",
-  "description": "A PHP wrapper around mysqldump CLI utility.",
-  "type": "library",
-  "require": {
-    "php": "^7.2",
-    "symfony/process": "^4.1"
-  },
-  "autoload": {
-    "psr-4": {
-      "MNIB\\": "src/"
+    "name": "mnib/mysqldump-php",
+    "description": "A PHP wrapper around mysqldump CLI utility.",
+    "type": "library",
+    "require": {
+        "php": "^7.2",
+        "symfony/process": "^4.1"
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "MNIB\\": "src/"
+        }
     }
-  }
 }
