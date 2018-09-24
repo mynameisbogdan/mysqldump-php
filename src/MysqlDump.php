@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace MNIB;
 
 use Symfony\Component\Process\Process;
@@ -23,15 +26,13 @@ class MysqlDump
     /** @var string|null */
     private $password;
 
-    /**
-     * @param string      $dbname
-     * @param string|null $host
-     * @param int|null    $port
-     * @param string|null $user
-     * @param string|null $password
-     */
-    public function __construct($dbname, $host = null, $port = null, $user = null, $password = null)
-    {
+    public function __construct(
+        string $dbname,
+        ?string $host = null,
+        ?int $port = null,
+        ?string $user = null,
+        ?string $password = null
+    ) {
         $this->dbname = $dbname;
         $this->host = $host;
         $this->port = $port;
@@ -40,11 +41,11 @@ class MysqlDump
     }
 
     /**
-     * @param array $options
+     * @param mixed[] $options
      *
      * @return bool
      */
-    public function run(array $options)
+    public function run(array $options): bool
     {
         if (!isset($options['file']) || !$options['file']) {
             throw new \RuntimeException('Required parameter "$options[\'file\']" is not set.');
@@ -105,7 +106,6 @@ class MysqlDump
                         'Dump type "%s" not valid. Valid options: null, "schema" or "data".',
                         $options['dump_type']
                     ));
-                    break;
             }
         }
 
@@ -140,12 +140,7 @@ class MysqlDump
         return true;
     }
 
-    /**
-     * @param string $command
-     *
-     * @return string
-     */
-    protected function execute($command)
+    protected function execute(string $command): string
     {
         $process = new Process($command);
         $process->setTimeout(3600);
