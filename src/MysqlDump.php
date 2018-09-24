@@ -4,33 +4,31 @@ namespace MNIB;
 use Symfony\Component\Process\Process;
 
 /**
- * Generates an archived db backup using mysqldump and pbzip2 (parallel bzip2)
+ * Generates an archived db backup using mysqldump and pbzip2 (parallel bzip2).
  */
 class MysqlDump
 {
     /** @var string */
     private $dbname;
 
-    /** @var null|string */
+    /** @var string|null */
     private $host;
 
-    /** @var null|string */
+    /** @var int|null */
     private $port;
 
-    /** @var null|string */
+    /** @var string|null */
     private $user;
 
-    /** @var null|string */
+    /** @var string|null */
     private $password;
 
     /**
-     * Constructor.
-     *
-     * @param string $dbname
-     * @param null $host
-     * @param null $port
-     * @param null $user
-     * @param null $password
+     * @param string      $dbname
+     * @param string|null $host
+     * @param int|null    $port
+     * @param string|null $user
+     * @param string|null $password
      */
     public function __construct($dbname, $host = null, $port = null, $user = null, $password = null)
     {
@@ -43,6 +41,7 @@ class MysqlDump
 
     /**
      * @param array $options
+     *
      * @return bool
      */
     public function run(array $options)
@@ -75,19 +74,19 @@ class MysqlDump
             $command .= sprintf(' --max_allowed_packet=%s', escapeshellarg($options['max_allowed_packet']));
         }
 
-        if (null !== $this->host && $this->host) {
+        if ($this->host !== null && $this->host) {
             $command .= sprintf(' --host=%s', escapeshellarg($this->host));
         }
 
-        if (null !== $this->port && $this->port) {
+        if ($this->port !== null && $this->port) {
             $command .= sprintf(' --port=%s', escapeshellarg($this->port));
         }
 
-        if (null !== $this->user && $this->user) {
+        if ($this->user !== null && $this->user) {
             $command .= sprintf(' --user=%s', escapeshellarg($this->user));
         }
 
-        if (null !== $this->password && $this->password) {
+        if ($this->password !== null && $this->password) {
             $command .= sprintf(' --password=%s', escapeshellarg($this->password));
         }
 
@@ -143,6 +142,7 @@ class MysqlDump
 
     /**
      * @param string $command
+     *
      * @return string
      */
     protected function execute($command)

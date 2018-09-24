@@ -1,5 +1,6 @@
 {
   "name": "mnib/mysqldump-php",
+  "description": "A PHP wrapper around mysqldump CLI utility.",
   "type": "library",
   "require": {
     "php": "^5.5|^7.0",
