@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MNIB;
 
 use Symfony\Component\Process\Process;
+use function dirname;
 
 /**
  * Generates an archived db backup using mysqldump and pbzip2 (parallel bzip2).
@@ -109,13 +110,13 @@ class MysqlDump
             }
         }
 
-        if (isset($options['selected_tables']) && is_array($options['selected_tables'])) {
+        if (isset($options['selected_tables']) && is_iterable($options['selected_tables'])) {
             foreach ($options['selected_tables'] as $table) {
                 $command .= ' ' . escapeshellarg($table);
             }
         }
 
-        if (isset($options['ignored_tables']) && is_array($options['ignored_tables'])) {
+        if (isset($options['ignored_tables']) && is_iterable($options['ignored_tables'])) {
             foreach ($options['ignored_tables'] as $table) {
                 $command .= sprintf(' --ignore-table=%s.%s', escapeshellarg($this->dbname), escapeshellarg($table));
             }
