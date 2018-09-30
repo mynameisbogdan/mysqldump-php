@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 namespace MNIB;
 
+use RuntimeException;
 use Symfony\Component\Process\Process;
+use UnexpectedValueException;
 use function dirname;
+use function escapeshellarg;
+use function file_exists;
+use function is_dir;
+use function is_iterable;
+use function sprintf;
 
 /**
  * Generates an archived db backup using mysqldump and pbzip2 (parallel bzip2).
@@ -49,12 +56,12 @@ class MysqlDump
     public function run(array $options): bool
     {
         if (!isset($options['file']) || !$options['file']) {
-            throw new \RuntimeException('Required parameter "$options[\'file\']" is not set.');
+            throw new RuntimeException('Required parameter "file" is not set.');
         }
 
         if (!is_dir(dirname($options['file']))) {
-            throw new \RuntimeException(sprintf(
-                'Directory %s does not exist for file value of %s',
+            throw new RuntimeException(sprintf(
+                'Directory "%s" does not exist for file value of "%s".',
                 dirname($options['file']),
                 $options['file']
             ));
@@ -64,8 +71,8 @@ class MysqlDump
 
         if (isset($options['defaults_extra_file']) && $options['defaults_extra_file']) {
             if (!file_exists($options['defaults_extra_file'])) {
-                throw new \RuntimeException(
-                    sprintf('Defaults extra file missing: %s', $options['defaults_extra_file'])
+                throw new RuntimeException(
+                    sprintf('Defaults extra file missing "%s".', $options['defaults_extra_file'])
                 );
             }
 
@@ -103,7 +110,7 @@ class MysqlDump
                     $command .= ' --no-create-info --no-create-db --skip-triggers --skip-routines';
                     break;
                 default:
-                    throw new \UnexpectedValueException(sprintf(
+                    throw new UnexpectedValueException(sprintf(
                         'Dump type "%s" not valid. Valid options: null, "schema" or "data".',
                         $options['dump_type']
                     ));
@@ -148,7 +155,7 @@ class MysqlDump
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new \RuntimeException($process->getErrorOutput());
+            throw new RuntimeException($process->getErrorOutput());
         }
 
         return $process->getOutput();
