@@ -1,5 +1,5 @@
 {
-    "name": "mnib-dev/mysqldump-php",
+    "name": "mnib-dev/mysqldump",
     "description": "A PHP wrapper around mysqldump CLI utility.",
     "type": "library",
     "require": {
@@ -8,6 +8,10 @@
     },
     "require-dev": {
         "mnib-dev/coding-standard": "dev-master"
+    },
+    "replace": {
+        "mnib/mysqldump-php": "self.version",
+        "mnib-dev/mysqldump-php": "self.version"
     },
     "config": {
         "preferred-install": {
