@@ -150,7 +150,7 @@ class MysqlDump
 
     protected function execute(string $command): string
     {
-        $process = new Process($command);
+        $process = Process::fromShellCommandline($command);
         $process->setTimeout(3600);
         $process->run();
 
