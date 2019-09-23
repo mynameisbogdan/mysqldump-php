@@ -22,8 +22,8 @@
         }
     },
     "replace": {
-        "mnib/mysqldump-php": "self.version",
-        "mnib-dev/mysqldump-php": "self.version"
+        "mnib/mysqldump-php": "*",
+        "mnib-dev/mysqldump-php": "*"
     },
     "scripts": {
         "cs:check": "vendor/bin/php-cs-fixer fix --dry-run --ansi -vvv --show-progress=estimating --diff --diff-format udiff",
