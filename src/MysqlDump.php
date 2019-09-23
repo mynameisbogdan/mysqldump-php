@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MNIB;
 
 use RuntimeException;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Process\Process;
-use UnexpectedValueException;
 use function dirname;
 use function escapeshellarg;
 use function file_exists;
@@ -55,9 +55,30 @@ class MysqlDump
      */
     public function run(array $options): bool
     {
-        if (!isset($options['file']) || !$options['file']) {
-            throw new RuntimeException('Required parameter "file" is not set.');
-        }
+        $resolver = new OptionsResolver();
+        $resolver
+            ->setDefined([
+                'archive',
+                'defaults_extra_file',
+                'max_allowed_packet',
+                'dump_type',
+                'selected_tables',
+                'ignored_tables',
+                'archive',
+            ])
+            ->setRequired([
+                'file',
+            ])
+            ->setDefault('mysqldump_bin', 'mysqldump')
+            ->setDefault('archive_pattern', 'pbzip2 --compress --best -c %1$s > %2$s')
+            ->setAllowedTypes('file', ['string'])
+            ->setAllowedTypes('defaults_extra_file', ['string'])
+            ->setAllowedTypes('dump_type', ['null', 'string'])
+            ->setAllowedTypes('selected_tables', ['string[]'])
+            ->setAllowedTypes('ignored_tables', ['string[]'])
+            ->setAllowedValues('dump_type', ['schema', 'data'])
+        ;
+        $options = $resolver->resolve($options);
 
         if (!is_dir(dirname($options['file']))) {
             throw new RuntimeException(sprintf(
@@ -67,7 +88,7 @@ class MysqlDump
             ));
         }
 
-        $command = 'mysqldump';
+        $command = escapeshellarg($options['mysqldump_bin']);
 
         if (isset($options['defaults_extra_file']) && $options['defaults_extra_file']) {
             if (!file_exists($options['defaults_extra_file'])) {
@@ -88,7 +109,7 @@ class MysqlDump
         }
 
         if ($this->port !== null && $this->port) {
-            $command .= sprintf(' --port=%s', escapeshellarg($this->port));
+            $command .= sprintf(' --port=%s', $this->port);
         }
 
         if ($this->user !== null && $this->user) {
@@ -109,11 +130,6 @@ class MysqlDump
                 case 'data':
                     $command .= ' --no-create-info --no-create-db --skip-triggers --skip-routines';
                     break;
-                default:
-                    throw new UnexpectedValueException(sprintf(
-                        'Dump type "%s" not valid. Valid options: null, "schema" or "data".',
-                        $options['dump_type']
-                    ));
             }
         }
 
@@ -135,9 +151,9 @@ class MysqlDump
         // Save to file
         $command .= sprintf(' > %s', escapeshellarg($options['file']));
 
-        if (isset($options['archive']) && $options['archive']) {
+        if (isset($options['archive']) && $options['archive'] && $options['archive_pattern']) {
             $command .= sprintf(
-                ' && pbzip2 --compress --best -c %s > %s',
+                ' && ' . $options['archive_pattern'],
                 escapeshellarg($options['file']),
                 escapeshellarg($options['archive'])
             );

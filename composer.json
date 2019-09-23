@@ -4,14 +4,11 @@
     "type": "library",
     "require": {
         "php": "^7.2",
+        "symfony/options-resolver": "^4.1",
         "symfony/process": "^4.1"
     },
     "require-dev": {
         "mnib-dev/coding-standard": "dev-master"
-    },
-    "replace": {
-        "mnib/mysqldump-php": "self.version",
-        "mnib-dev/mysqldump-php": "self.version"
     },
     "config": {
         "preferred-install": {
@@ -23,5 +20,13 @@
         "psr-4": {
             "MNIB\\": "src/"
         }
+    },
+    "replace": {
+        "mnib/mysqldump-php": "self.version",
+        "mnib-dev/mysqldump-php": "self.version"
+    },
+    "scripts": {
+        "cs:check": "vendor/bin/php-cs-fixer fix --dry-run --ansi -vvv --show-progress=estimating --diff --diff-format udiff",
+        "cs:fix": "vendor/bin/php-cs-fixer fix --ansi -vvv --show-progress=estimating --diff --diff-format udiff"
     }
 }
