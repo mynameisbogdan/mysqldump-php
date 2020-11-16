@@ -3,9 +3,9 @@
     "description": "A PHP wrapper around mysqldump CLI utility.",
     "type": "library",
     "require": {
-        "php": "^7.2",
-        "symfony/options-resolver": "^4.1|^5.0",
-        "symfony/process": "^4.1|^5.0"
+        "php": "^7.2.5||^8.0",
+        "symfony/options-resolver": "^4.1||^5.0",
+        "symfony/process": "^4.1||^5.0"
     },
     "require-dev": {
         "mnib-dev/coding-standard": "dev-master"
