@@ -1,0 +1,36 @@
+{
+    "name": "mnib-dev/mysqldump",
+    "description": "A PHP wrapper around mysqldump CLI utility.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^7.2.5 || ^8.0.2",
+        "symfony/options-resolver": "^4.4 || ^5.3 || ^6.0",
+        "symfony/process": "^4.4 || ^5.3 || ^6.0"
+    },
+    "require-dev": {
+        "mnib-dev/coding-standard": "dev-master"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "MNIB\\": "src/"
+        }
+    },
+    "replace": {
+        "mnib/mysqldump-php": "*",
+        "mnib-dev/mysqldump-php": "*"
+    },
+    "scripts": {
+        "cs:check": "vendor/bin/php-cs-fixer fix --dry-run --ansi -vvv --show-progress=estimating --diff --diff-format udiff",
+        "cs:fix": "vendor/bin/php-cs-fixer fix --ansi -vvv --show-progress=estimating --diff --diff-format udiff"
+    }
+}
