@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace MNIB;
 
+use InvalidArgumentException;
 use RuntimeException;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Process\Process;
 use function dirname;
@@ -58,31 +60,45 @@ class MysqlDump
         $resolver = new OptionsResolver();
         $resolver
             ->setDefined([
-                'archive',
                 'defaults_extra_file',
                 'max_allowed_packet',
                 'dump_type',
                 'selected_tables',
                 'ignored_tables',
-                'archive',
             ])
-            ->setRequired([
-                'file',
-            ])
+            ->setDefault('file', null)
             ->setDefault('mysqldump_bin', 'mysqldump')
+            ->setDefault('archive', null)
             ->setDefault('archive_pattern', 'pbzip2 --compress --best -c %1$s > %2$s')
+            ->setDefault('archive_pipe', false)
             ->setDefault('hex_blob', false)
-            ->setAllowedTypes('file', ['string'])
+            ->setAllowedTypes('file', ['null', 'string'])
             ->setAllowedTypes('defaults_extra_file', ['string'])
             ->setAllowedTypes('dump_type', ['null', 'string'])
             ->setAllowedTypes('selected_tables', ['string[]'])
             ->setAllowedTypes('ignored_tables', ['string[]'])
+            ->setAllowedTypes('archive', ['null', 'string'])
+            ->setAllowedTypes('archive_pipe', ['bool'])
             ->setAllowedTypes('hex_blob', ['bool'])
             ->setAllowedValues('dump_type', ['schema', 'data'])
+            ->setNormalizer('file', function(Options $options, $file) {
+                if ($file === null && $options['archive'] === null && !$options['archive_pipe']) {
+                    throw new InvalidArgumentException('"file" option must be set when "archive" is not set and "archive_pipe" is false.');
+                }
+
+                return $file;
+            })
+            ->setNormalizer('archive', function(Options $options, $archive) {
+                if ($archive === null && $options['file'] === null) {
+                    throw new InvalidArgumentException('"archive" option must be set when "file" is not set.');
+                }
+
+                return $archive;
+            })
         ;
         $options = $resolver->resolve($options);
 
-        if (!is_dir(dirname($options['file']))) {
+        if ($options['file'] !== null && !is_dir(dirname($options['file']))) {
             throw new RuntimeException(sprintf(
                 'Directory "%s" does not exist for file value of "%s".',
                 dirname($options['file']),
@@ -155,13 +171,17 @@ class MysqlDump
         $command .= ' | sed \'s/DEFINER=[^ |\*]*//g\'';
 
         // Save to file
-        $command .= sprintf(' > %s', escapeshellarg($options['file']));
+        if ($options['file'] && !$options['archive_pipe']) {
+            $command .= sprintf(' > %s', escapeshellarg($options['file']));
+        }
 
-        if (isset($options['archive']) && $options['archive'] && $options['archive_pattern']) {
+        if ($options['archive'] && $options['archive_pattern']) {
+            $command .= $options['archive_pipe'] ? ' | ' : ' && ';
+
             $command .= sprintf(
-                ' && ' . $options['archive_pattern'],
-                escapeshellarg($options['file']),
-                escapeshellarg($options['archive'])
+                $options['archive_pattern'],
+                escapeshellarg((string)$options['file']),
+                escapeshellarg((string)$options['archive'])
             );
         }
 
