@@ -9,6 +9,7 @@ use RuntimeException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Process\Process;
+
 use function dirname;
 use function escapeshellarg;
 use function file_exists;
@@ -81,14 +82,14 @@ class MysqlDump
             ->setAllowedTypes('archive_pipe', ['bool'])
             ->setAllowedTypes('hex_blob', ['bool'])
             ->setAllowedValues('dump_type', ['schema', 'data'])
-            ->setNormalizer('file', function(Options $options, $file) {
+            ->setNormalizer('file', function (Options $options, $file) {
                 if ($file === null && $options['archive'] === null && !$options['archive_pipe']) {
                     throw new InvalidArgumentException('"file" option must be set when "archive" is not set and "archive_pipe" is false.');
                 }
 
                 return $file;
             })
-            ->setNormalizer('archive', function(Options $options, $archive) {
+            ->setNormalizer('archive', function (Options $options, $archive) {
                 if ($archive === null && $options['file'] === null) {
                     throw new InvalidArgumentException('"archive" option must be set when "file" is not set.');
                 }

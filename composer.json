@@ -4,7 +4,7 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "php": "^7.2.5 || ^8.0.2",
+        "php": "^7.3 || ^8.0.2",
         "symfony/options-resolver": "^4.4 || ^5.3 || ^6.0",
         "symfony/process": "^4.4 || ^5.3 || ^6.0"
     },
@@ -30,7 +30,7 @@
         "mnib-dev/mysqldump-php": "*"
     },
     "scripts": {
-        "cs:check": "vendor/bin/php-cs-fixer fix --dry-run --ansi -vvv --show-progress=estimating --diff --diff-format udiff",
-        "cs:fix": "vendor/bin/php-cs-fixer fix --ansi -vvv --show-progress=estimating --diff --diff-format udiff"
+        "cs:check": "vendor/bin/php-cs-fixer fix --dry-run --ansi -vvv --show-progress=dots --diff",
+        "cs:fix": "vendor/bin/php-cs-fixer fix --ansi -vvv --show-progress=dots --diff"
     }
 }
