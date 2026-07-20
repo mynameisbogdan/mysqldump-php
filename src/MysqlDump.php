@@ -73,6 +73,8 @@ class MysqlDump
             ->setDefault('archive_pattern', 'pbzip2 --compress --best -c %1$s > %2$s')
             ->setDefault('archive_pipe', false)
             ->setDefault('hex_blob', false)
+            ->setDefault('routines', true)
+            ->setDefault('triggers', true)
             ->setAllowedTypes('file', ['null', 'string'])
             ->setAllowedTypes('defaults_extra_file', ['string'])
             ->setAllowedTypes('dump_type', ['null', 'string'])
@@ -81,6 +83,8 @@ class MysqlDump
             ->setAllowedTypes('archive', ['null', 'string'])
             ->setAllowedTypes('archive_pipe', ['bool'])
             ->setAllowedTypes('hex_blob', ['bool'])
+            ->setAllowedTypes('routines', ['bool'])
+            ->setAllowedTypes('triggers', ['bool'])
             ->setAllowedValues('dump_type', ['schema', 'data'])
             ->setNormalizer('file', function (Options $options, $file) {
                 if ($file === null && $options['archive'] === null && !$options['archive_pipe']) {
@@ -139,7 +143,15 @@ class MysqlDump
             $command .= sprintf(' --password=%s', escapeshellarg($this->password));
         }
 
-        $command .= sprintf(' --single-transaction --routines --triggers %s', escapeshellarg($this->dbname));
+        if ($options['routines']) {
+            $command .= ' --routines';
+        }
+
+        if ($options['triggers']) {
+            $command .= ' --triggers';
+        }
+
+        $command .= sprintf(' --single-transaction %s', escapeshellarg($this->dbname));
 
         if (isset($options['dump_type']) && $options['dump_type']) {
             switch ($options['dump_type']) {
